@@ -153,7 +153,7 @@
         // })
     </script>
 
-    <!-- 第二种方法 -->
+    <!-- 第二种方法 类别查询 -->
     <script src="./js/template-web.js"></script>
     <script type="text/html" id="categoryTr">
         {{each data item}}
@@ -163,17 +163,37 @@
                 <td class="text-center">
                     <a href="javascript:editTr({&quot;id&quot;:&quot;3&quot;,&quot;slug&quot;:&quot;living&quot;,&quot;name&quot;:&quot;会生活&quot;});"
                         class="btn btn-info btn-xs">编辑</a>
-                    <a href="javascript:deleteTr( 3 );" class="btn btn-danger btn-xs">删除</a>
+                    <a href="javascript:deleteTr({{item.id}});" class="btn btn-danger btn-xs">删除</a>
                 </td>
             </tr>
         {{/each}}
     </script>
     <script>
+       function getAllcategory(){
         $.get('http://localhost:8000/admin/category_search',function(res){
             if(res.code===200){
                 $('#tbody').html(template('categoryTr',res));
             }
-        });
+         });
+       }
+       getAllcategory();
+
+
+       //删除类别
+        // 基本步骤 ：
+            // 1. 拿到id值：在模板中已经拼接上id了。
+            // 2. 调用接口，实现删除
+            // 3. 根据请求的数据，做后续的操作
+            function deleteTr(id){
+                $.post('http://localhost:8000/admin/category_delete',{id:id},function(res){
+                    console.log(res);
+                    if(res.code ===200){
+                        //删除成功
+                        //重新请求数据,更新表格
+                        getAllcategory();
+                    }
+                })
+            }
     </script>
 </body>
 
