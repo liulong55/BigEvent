@@ -19,25 +19,25 @@
         <div class="row spannel_list">
             <div class="col-sm-3 col-xs-6">
                 <div class="spannel">
-                    <em>10015</em><span>篇</span>
+                    <em id="all_count">10015</em><span>篇</span>
                     <b>总文章数</b>
                 </div>
             </div>
             <div class="col-sm-3 col-xs-6">
                 <div class="spannel scolor01">
-                    <em>123</em><span>篇</span>
+                    <em id="day_count">123</em><span>篇</span>
                     <b>日新增文章数</b>
                 </div>
             </div>
             <div class="col-sm-3 col-xs-6">
                 <div class="spannel scolor02">
-                    <em>35</em><span>条</span>
+                    <em id="all_count2">35</em><span>条</span>
                     <b>评论总数</b>
                 </div>
             </div>
             <div class="col-sm-3 col-xs-6">
                 <div class="spannel scolor03">
-                    <em>123</em><span>条</span>
+                    <em id="day_count2">123</em><span>条</span>
                     <b>日新增评论数</b>
                 </div>
             </div>
@@ -344,8 +344,24 @@
             oColumn.setOption(oColumnopt);
 
     </script>
-
-
+    <script>
+        //获取文章数量等
+        $.get('http://localhost:8000/admin/article_count',function(res){
+            // console.log(res);
+            if(res.code===200){
+               $('#all_count').text(res.data.all_count);
+               $('#day_count').text(res.data.day_count);
+            }
+        })
+        $.get('http://localhost:8000/admin/comment_count',function(res){
+                // console.log(res)
+                if(res.code===200){
+                    $('#all_count2').text(res.data.all_count);
+                    $('#day_coun').text(res.data.day_count);
+                }
+        })
+    
+    </script>
 </body>
 
 </html>
