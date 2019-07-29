@@ -72,7 +72,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增分类</a>
+                            <a href="#" class="btn btn-success" data-toggle="modal" id="showAddDialog" data-target="#addModal">新增分类</a>
                         </td>
                     </tr>
                 </tfoot>
@@ -85,7 +85,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
-                    <h4 class="modal-title">新增分类</h4>
+                    <h4 class="modal-title" id="xinceng">新增分类</h4>
                 </div>
                 <div class="modal-body">
                     <form>
@@ -98,6 +98,8 @@
                             <input type="text" class="form-control" id="recipient-slug">
                         </div>
                     </form>
+                    <div id="errMsg">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" id="model_shutoff">关闭</button>
@@ -118,30 +120,91 @@
             $('#addModal').modal('hide');
         });
 
-      //#region---------------文章类别添加开始------------------
-      $('#model_add').click(function () {
-            // alert('add');
-            var name=$('#recipient-name').val().trim();
-            var slug=$('#recipient-slug').val().trim();
-            $.post('http://localhost:8000/admin/category_add',{name:name,slug:slug},function(res){
-                    console.log(res);
-                   if(res.code===200){
+        //#region---------------文章类别添加开始------------------
+        //点击新增的时候把里面新加的div清空
+        $('#showAddDialog').click(function(){
+             $("#errMsg").hide().text('');
+        })
+           
+        
+
+        function doAdd() {
+            var name = $('#recipient-name').val().trim();
+            var slug = $('#recipient-slug').val().trim();
+
+            $.post('http://localhost:8000/admin/category_add', { name: name, slug: slug }, function (res) {
+                // console.log(res);
+                
+                if (res.code === 200) {
+                 
+
                     $('#addModal').modal('hide');
-                    getAllcategory();
+                    //不提示错误
+                    $("#errMsg").hide().text('');
+
+                    //清除输入框的内容
                     $('#recipient-slug').val('');
                     $('#recipient-name').val('');
-                   }
-                })
-            })
-           
-      //#endregion-----------------文章类别添加结束--------------
 
-        $('.category_table').delegate('a', 'click', function () {
-            if ($(this).hasClass('btn-info')) {
-                $('#addModal .modal-title').html('修改分类名称');
-                $('#addModal').modal('show');
+                    //重新请求数据
+                   getAllcategory();
+                }
+                else  {
+                    //提示重复错误
+                    $("#errMsg").show().text(res.msg);
+                    // $('#recipient-slug').val('');
+                    // $('#recipient-name').val('');
+
+                }
+            })
+        }
+
+        function doEdit() {
+            // alert(currentEditId)
+            // 基本步骤 ：
+            // 1.获取用户的参数
+            var name = $("#recipient-name").val().trim();
+            var slug = $("#recipient-slug").val().trim();
+            // 2.调用接口
+            $.post("http://localhost:8000/admin/category_edit", {
+                id: currentEditId,
+                name: name,
+                slug: slug,
+            }, function (res) {
+                // debugger;
+                console.log(res);
+                if (res.code === 200) {
+                    $('#addModal').modal('hide');
+                    getAllcategory();
+                    // 3.修改成功  
+                    // 3.1隐藏弹出框
+                    // 3.2重新请求数据
+                }
+            })
+        }
+
+        // 基本步骤 ：
+        // 1.获取用户的参数
+        // 2.调用接口
+        // 3.添加成功  
+        // 3.1隐藏弹出框
+        // 3.2重新请求数据
+        $('#model_add').click(function () {
+            
+            if ($('#addModal #model_add').html() === '添加') {
+                //做添加
+                doAdd();
             }
-        })      
+            else {
+                //做修改
+                doEdit();
+            }
+
+        });
+
+        //#endregion-----------------文章类别添加结束--------------
+
+         
     </script>
 
     <!-- 文章类别管理 -->
@@ -174,40 +237,73 @@
                 <td>{{item.name}}</td>
                 <td>{{item.slug}}</td>
                 <td class="text-center">
-                    <a href="javascript:editTr({&quot;id&quot;:&quot;3&quot;,&quot;slug&quot;:&quot;living&quot;,&quot;name&quot;:&quot;会生活&quot;});"
-                        class="btn btn-info btn-xs">编辑</a>
+                        <a href="javascript:showEditDialog({{item}});" class="btn btn-info btn-xs">编辑</a>
                     <a href="javascript:deleteTr({{item.id}});" class="btn btn-danger btn-xs">删除</a>
                 </td>
             </tr>
         {{/each}}
     </script>
     <script>
-       function getAllcategory(){
-        $.get('http://localhost:8000/admin/category_search',function(res){
-            if(res.code===200){
-                $('#tbody').html(template('categoryTr',res));
-            }
-         });
-       }
-       getAllcategory();
+        var currentEditId = "";//正在编辑的类别的id值；
 
 
-       //删除类别
+        //类别查询
+        function getAllcategory() {
+            $.get('http://localhost:8000/admin/category_search', function (res) {
+                if (res.code === 200) {
+                    $('#tbody').html(template('categoryTr', res));
+                }
+            });
+        }
+        getAllcategory();
+
+
+        //删除类别
         // 基本步骤 ：
-            // 1. 拿到id值：在模板中已经拼接上id了。
-            // 2. 调用接口，实现删除
-            // 3. 根据请求的数据，做后续的操作
-            function deleteTr(id){
-                $.post('http://localhost:8000/admin/category_delete',{id:id},function(res){
-                    console.log(res);
-                    if(res.code ===200){
-                        //删除成功
-                        //重新请求数据,更新表格
-                        getAllcategory();
-                    }
-                })
-            }
+        // 1. 拿到id值：在模板中已经拼接上id了。
+        // 2. 调用接口，实现删除
+        // 3. 根据请求的数据，做后续的操作
+        function deleteTr(id) {
+            $.post('http://localhost:8000/admin/category_delete', { id: id }, function (res) {
+                console.log(res);
+                if (res.code === 200) {
+                    //删除成功
+                    //重新请求数据,更新表格
+                    getAllcategory();
+                }
+            })
+        }
 
+        //#region---------------编辑类别开始------------------
+         // 基本步骤 ：
+            // 1. 给a标签添加一个函数：用来对要编辑的内容进行初始化
+            // 2. 由于编辑和添加共用一个dialog，所以，给确认按钮添加click时，
+            // 要注意当前的操作是修改，还是添加
+            function showEditDialog(obj) {
+                console.log(obj);
+                // 更新 当前编辑的id
+                currentEditId = obj.id;
+                $('#addModal .modal-title').html('修改分类名称');
+                $('#addModal #model_add').html('保存修改');
+
+                //把当前要编辑的内容，显示在input框
+                $("#recipient-name").val(obj.name);
+                $("#recipient-slug").val(obj.slug);
+                // 显示
+                $('#addModal').modal('show');
+            }
+            //#endregion -------------------------------- 编辑类别 结束 -----------------------------------
+            $("#showAddDialog").click(function () {
+                $('#addModal .modal-title').html('添加分类名称');
+                $('#addModal #model_add').html('添加');
+                $("#recipient-name").val('');
+                $("#recipient-slug").val('');
+
+            })
+
+
+
+        //#endregion-----------------编辑类别结束--------------
     </script>
 </body>
 
