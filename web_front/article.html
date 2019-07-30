@@ -58,10 +58,10 @@
             <div class="breadcrumb">
                 当前位置： <a href="#">首页</a> &gt; <a href="#">科技</a> &gt; 文章详情
             </div>
-            <h3 class="article_title">马斯克的新花样？连接人脑和电脑的初创公司又筹了一笔钱</h3>
-            <div class="article_info">杰克 发布于 2019-05-08 07:08:46&nbsp;&nbsp;&nbsp;分类: 奇趣事&nbsp;&nbsp;&nbsp;阅读:
+            <h3 class="article_title" id="title">马斯克的新花样？连接人脑和电脑的初创公司又筹了一笔钱</h3>
+            <div class="article_info"> <label id="author">杰克</label> 发布于 <label id="date">2019-05-08 07:08:46</label> &nbsp;&nbsp;&nbsp;分类: 奇趣事&nbsp;&nbsp;&nbsp;阅读:
                 (98)&nbsp;&nbsp;&nbsp;评论: (0)</div>
-            <div class="article_con">
+            <div class="article_con" id="content">
 
                 <p>“上天入地”还不够？硅谷“钢铁侠”马斯克名下一家低调的公司最近又融了一大笔钱。</p>
 
@@ -204,7 +204,22 @@
         <p>CopyRight © 2019 深圳大事件信息技术股份有限公司 All Rights Reserved</p>
         <p>电话：0755-****888 粤ICP备*******8号</p>
     </div>
-
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <script>
+        //根据地址来显示对于的详细页面
+        function getDetail(){
+            var id=window.location.search.substr(4);
+            $.get('http://localhost:8000/admin/search',{id:id},function(res){
+                console.log(res);
+                if(res.code===200){
+                    $('#title').text(res.data.title);
+                    $('#date').text(res.data.date);
+                    $('#author').text(res.data.author);
+                    $('#content').html(res.data.content);
+                }
+            })
+        }
+        getDetail()
+    </script>
 </body>
-
 </html>

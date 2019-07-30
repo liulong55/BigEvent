@@ -227,12 +227,12 @@
         {{each data item index}}
         {{if index==0}}
             <li class="first">
-                <a href="article.html"><img src="{{item.cover}}" alt="{{item.title}}"></a>
+                <a href="article.html?id={{item.id}}"><img src="{{item.cover}}" alt="{{item.title}}"></a>
                 <p>{{item.title}}</p>
             </li>
         {{else}}
             <li>
-                <a href="article.html"><img src="{{item.cover}}" alt="{{item.title}}"></a>
+                <a href="article.html?id={{item.id}}"><img src="{{item.cover}}" alt="{{item.title}}"></a>
                 <p>{{item.title}}</p>
                 </li>
            {{/if}}  
