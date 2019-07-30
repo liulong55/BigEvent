@@ -55,7 +55,7 @@
 
     <div class="main_con clearfix">
         <div class="left_con">
-            <ul class="focus_list">
+            <ul class="focus_list" id="fugai">
                 <li class="first">
                     <a href="#"><img src="images/pic01.jpg" alt=""></a>
                     <p>图片说明</p>
@@ -221,6 +221,36 @@
         <p>电话：0755-****888    粤ICP备*******8号</p>
     </div>
 
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <script src="./js/template-web.js"></script>
+    <script type="text/html" id="template_list">
+        {{each data item index}}
+        {{if index==0}}
+            <li class="first">
+                <a href="article.html"><img src="{{item.cover}}" alt="{{item.title}}"></a>
+                <p>{{item.title}}</p>
+            </li>
+        {{else}}
+            <li>
+                <a href="article.html"><img src="{{item.cover}}" alt="{{item.title}}"></a>
+                <p>{{item.title}}</p>
+                </li>
+           {{/if}}  
+        {{/each}}
+    </script>
+    <script>
+        //获取最新的文章
+        function gitwenz(){
+            $.getJSON('http://localhost:8000/admin/search',
+            {perpage:5},
+            function(res){
+                console.log(res);
+               var htmlstr= template('template_list',res);
+              $('#fugai').html(htmlstr);
+            })
+        }
+        gitwenz();
+    </script>
 </body>
 
 </html>
